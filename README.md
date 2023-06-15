@@ -10,7 +10,7 @@ Vision Transformer는 자연어 처리에서 많이 사용되었던 Transformer�
   attention: 입력 시퀀스 내에서 서로 다른 위치 간의 상관관계를 고려하여 가중치를 계산하는 방법이다. 이를 통해 입력 시퀀스 내에서 어떤 위치들이 중요한지를 결정할 수 있다. SE-Block에서는 squeeze 연산(Global Average Pooling)으로 특성 맵의 채널별로 평균값을 계산하고, 이를 이용하여 채널별로 중요도를 계산하는 것이다. 그리고 이 중요도는 각 채널의 가중치로 사용되어, 더 중요한 채널은 더 큰 가중치를 가지게 된다. 이렇게 계산된 가중치를 이용하여 특성 맵의 정보를 조절하게 된다. 따라서 squeeze 연산은 특성 맵 내에서 특정 채널이나 위치에 집중하는 attention 기법의 일종으로 볼 수 있다.
   self-attention: 입력 시퀀스 내의 각 위치를 서로 연결하여 가중치를 계산하고, 이를 기반으로 입력 시퀀스 내의 각 위치가 다른 위치에 미치는 영향력을 결정하는 방법이다. 입력 데이터를 쿼리(query), 키(key), 밸류(value)로 변환한 뒤, 쿼리와 모든 키 간의 유사도를 계산한다. 이 유사도에 softmax 함수를 적용하여 attention weight를 계산한다. attention weight와 value의 행렬을 곱한 값이 출력된다. 본 논문에서는 기존 SE-Block을 변형시켜 Squeeze & Excitation을 구현한 뒤, 그 값을 활용해 self-attention을 한다. 이는 입력 데이터 내에서 특성 간의 의존성을 파악하거나, 전체 데이터에서 중요한 정보를 추출하는 데 유용하다.
     3) 연구계획   
-기존의 SEBlock[2]을 수정해서 SENet_self를 구축해 새로운 네트워크를 만들고자 한다. SEBlock의 excitation이 끝나고 난 뒤, 값을 Flatten 시키고 MSA를 시도한다. 나온 값은 다시 처음 input 값과 차원을 같게 만들어 준다. 이렇게 새로 만든 SENet_self 네트워크를 다른 네트워크(ResNet, SENet)와 비교해 보고자 한다.\
+기존의 SEBlock[2]을 수정해서 SENet_self를 구축해 새로운 네트워크를 만들고자 한다. SEBlock의 excitation이 끝나고 난 뒤, 값을 Flatten 시키고 MSA를 시도한다. 나온 값은 다시 처음 input 값과 차원을 같게 만들어 준다. 이렇게 새로 만든 SENet_self 네트워크를 다른 네트워크(ResNet, SENet)와 비교해 보고자 한다.
 
 
 2. 본문   
@@ -20,7 +20,7 @@ Vision Transformer는 자연어 처리에서 많이 사용되었던 Transformer�
 x = x.flatten(2).transpose(1, 2)  # (batch_size, seq_len, hidden_dim)
 다음으로 x를 multiheadattention 에 넣어준다.
 x = self.multihead_attn(x, x, x)[0] # query, key, value 벡터로 x가 같게 들어감
-Query: $Q_i = XQ_i^Q / Key:  / Value: 
+Query: \Q_i = XQ_i^Q / Key:  / Value: 
 , , 는 각 head 에 해당하는 Query, Key, Value에 대한 가중치 행렬.
 이후, 각 head에서 계산된 Query와 Key의 내적값을 로 나눠주고, Softmax 함수를 적용해 각 head에서 계산된 가중치를 구한다.
 
