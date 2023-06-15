@@ -2,7 +2,7 @@
 # SENet에 Multihead_self_attention을 추가한 구조 모델링  
 
 ## INDEX  
-1. 서론   
+#1. 서론   
     1) 연구의 필요성   
 Vision Transformer는 자연어 처리에서 많이 사용되었던 Transformer를 이미지 처리에 도입한 것이다. ViT의 핵심 아이디어인 multi-head attention의 특성을 탐구해 보고자, ResNet에 Self-Attention Block을 추가해 Self-attention의 특징과 Convolutional Network에 이를 적용했을 때의 성능차이에 대한 연구를 해 보고자 한다. ILSVRC 2017 우승 모델인 SENet의 핵심 아이디어 squeeze and excitation이 Image에 대하여 attention을 적용한 기법이다. ResNet에 SE-Block만 추가한 구조가 되는데, 이 SE-Block을 변형시켜 attention에 self-attention을 더한 모델을 연구해 보고자 한다.   
     2) 관련 연구   
@@ -13,14 +13,14 @@ Vision Transformer는 자연어 처리에서 많이 사용되었던 Transformer�
 기존의 SEBlock[2]을 수정해서 SENet_self를 구축해 새로운 네트워크를 만들고자 한다. SEBlock의 excitation이 끝나고 난 뒤, 값을 Flatten 시키고 MSA를 시도한다. 나온 값은 다시 처음 input 값과 차원을 같게 만들어 준다. 이렇게 새로 만든 SENet_self 네트워크를 다른 네트워크(ResNet, SENet)와 비교해 보고자 한다.
 
 
-2. 본문   
+#2. 본문   
     1) 방법   
 본래 SEBlock에 구현되어있던 SEBlock에 MSA(emb_size, num_heads)를 추가한다.      
 먼저 excitation의 output을 MSA에 입력시키기 위해 차원을 변경해 준다.
 x = x.flatten(2).transpose(1, 2)  # (batch_size, seq_len, hidden_dim)
 다음으로 x를 multiheadattention 에 넣어준다.
 x = self.multihead_attn(x, x, x)[0] # query, key, value 벡터로 x가 같게 들어감
-Query: \Q_i = XQ_i^Q / Key:  / Value: 
+Query: $Q_i = XQ_i^Q$ / Key:  / Value: 
 , , 는 각 head 에 해당하는 Query, Key, Value에 대한 가중치 행렬.
 이후, 각 head에서 계산된 Query와 Key의 내적값을 로 나눠주고, Softmax 함수를 적용해 각 head에서 계산된 가중치를 구한다.
 
